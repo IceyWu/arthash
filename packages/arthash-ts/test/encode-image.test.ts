@@ -1,19 +1,15 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-// Vitest supports virtual mocks at runtime for this generated WASM module,
-// but the installed type declarations only expose the two-argument overload.
-vi.mock(
-  "../wasm/pkg/arthash_wasm.js",
-  () => ({
-    default: vi.fn(async () => undefined),
-    encodeRgb: vi.fn(() => new Uint8Array([0])),
-    encodeRgba: vi.fn(() => new Uint8Array([0])),
-    decode: vi.fn(),
-    toSvg: vi.fn(),
-  }),
-  // @ts-expect-error Vitest's runtime supports this virtual mock overload.
-  { virtual: true },
-);
+// Mock the generated wasm boundary so this suite only exercises the DOM /
+// ImageBitmap plumbing. `wasm/pkg` always exists here: CI runs `build`
+// before `test`.
+vi.mock("../wasm/pkg/arthash_wasm.js", () => ({
+  default: vi.fn(async () => undefined),
+  encodeRgb: vi.fn(() => new Uint8Array([0])),
+  encodeRgba: vi.fn(() => new Uint8Array([0])),
+  decode: vi.fn(),
+  toSvg: vi.fn(),
+}));
 
 import { codec, encodeImage } from "../src/index.js";
 
